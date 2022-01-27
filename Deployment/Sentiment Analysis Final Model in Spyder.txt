@@ -1,0 +1,34 @@
+import pickle
+from sklearn.svm import LinearSVC
+import nltk
+import re
+nltk.download('stopwords')
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+from sklearn.feature_extraction.text import CountVectorizer
+vec_file=pickle.load(open('C:/Users/vinis/OneDrive/Desktop/Deployment/vectorizer.sav','rb'))
+model_2=pickle.load(open('C:/Users/vinis/OneDrive/Desktop/Deployment/Example2.sav','rb'))
+def predict_sentiment(sample_review):
+    sample_review = re.sub(pattern='[^a-zA-Z]',repl=' ', string = sample_review)
+    sample_review = sample_review.lower()
+    sample_review_words = sample_review.split()
+    sample_review_words = [word for word in sample_review_words if not word in set(stopwords.words('english'))]
+    ps = PorterStemmer()
+    final_review = [ps.stem(word) for word in sample_review_words]
+    final_review = ' '.join(final_review)
+    temp = vec_file.transform([final_review]).toarray()
+    return model_2.predict(temp)
+
+def model(review):
+    x=predict_sentiment(review)
+    x1=np.array([1])
+    if np.array_equal(x,x1):
+        print("This is a POSITIVE review.")
+    else:
+        print("This is a NEGATIVE review!")
+        
+def main():
+   model("Outstanding")
+    
+if __name__=='__main__':
+    main()
